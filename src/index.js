@@ -10,6 +10,7 @@ const redis = require('./state/redis');
 const bridge = require('./bridge/client');
 const wsServer = require('./events/wsServer');
 const apiRoutes = require('./api/routes');
+const manager = require('./supervisor/manager');
 
 async function main() {
   logger.info('Starting Livewire 58K Command Center');
@@ -17,11 +18,14 @@ async function main() {
   // 1. Connect Redis
   redis.connect();
 
-  // 2. Verify ARI Bridge is reachable
+  // 2. Restore sessions from Redis
+  await manager.initialize();
+
+  // 3. Verify ARI Bridge is reachable
   const health = await bridge.healthCheck();
   logger.info({ bridge: health }, 'ARI Bridge connected');
 
-  // 3. Start HTTP + WebSocket on a single port
+  // 4. Start HTTP + WebSocket on a single port
   const app = express();
   app.use(express.json());
   app.use(express.static('public'));

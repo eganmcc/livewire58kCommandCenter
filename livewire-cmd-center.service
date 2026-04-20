@@ -1,0 +1,27 @@
+[Unit]
+Description=Livewire 58K Command Center
+Documentation=https://github.com/yourorg/livewire58k-command-center
+After=network.target redis.service
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/opt/livewire58k-command-center
+Environment=NODE_ENV=production
+EnvironmentFile=/opt/livewire58k-command-center/.env.production
+ExecStart=/usr/bin/node src/index.js
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=livewire-cmd
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/livewire58k-command-center
+
+[Install]
+WantedBy=multi-user.target

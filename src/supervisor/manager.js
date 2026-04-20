@@ -103,7 +103,31 @@ function getAllSessions() {
   return Array.from(activeSessions.values());
 }
 
+async function initialize() {
+  logger.info('Initializing supervisor manager - restoring sessions from Redis');
+  
+  try {
+    const keys = await redis.getAllSupervisionKeys();
+    logger.info({ count: keys.length }, 'Found supervision keys in Redis');
+    
+    for (const key of keys) {
+      const bridgeId = key.replace(/^sup:/, '');
+      const sessionData = await redis.getSupervisionState(bridgeId);
+      
+      if (sessionData) {
+        activeSessions.set(bridgeId, sessionData);
+        logger.info({ bridgeId, mode: sessionData.mode }, 'Restored session from Redis');
+      }
+    }
+    
+    logger.info({ restored: activeSessions.size }, 'Session restoration complete');
+  } catch (err) {
+    logger.error({ err }, 'Failed to restore sessions from Redis');
+  }
+}
+
 module.exports = {
+  initialize,
   startSupervision,
   changeMode,
   stopSupervision,
