@@ -1,0 +1,22 @@
+{
+  "name": "livewire58k-command-center",
+  "version": "2.0.0",
+  "description": "Supervisor Command Center — delegates to ARI Bridge for call supervision (listen/whisper/barge)",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "ioredis": "^5.10.1",
+    "pino": "^10.3.1",
+    "ws": "^8.20.0"
+  }
+}

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Livewire 58K — Command Center</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; padding: 24px; }
+    h1 { font-size: 1.5rem; margin-bottom: 8px; }
+    .subtitle { color: #94a3b8; margin-bottom: 24px; font-size: 0.875rem; }
+    .status-bar { display: flex; gap: 16px; margin-bottom: 24px; }
+    .status-item { background: #1e293b; border-radius: 8px; padding: 16px 20px; flex: 1; }
+    .status-item .label { color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .status-item .value { font-size: 1.25rem; font-weight: 600; margin-top: 4px; }
+    .ok { color: #4ade80; }
+    .degraded { color: #fbbf24; }
+    .error { color: #f87171; }
+    #sessions-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    #sessions-table th, #sessions-table td { text-align: left; padding: 10px 14px; border-bottom: 1px solid #1e293b; }
+    #sessions-table th { color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+    .badge-monitor { background: #164e63; color: #67e8f9; }
+    .badge-whisper { background: #3b0764; color: #d8b4fe; }
+    .badge-barge { background: #7c2d12; color: #fdba74; }
+    .empty { color: #475569; text-align: center; padding: 40px; }
+    #events { margin-top: 24px; background: #1e293b; border-radius: 8px; padding: 16px; max-height: 300px; overflow-y: auto; font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 0.8rem; }
+    #events .event { padding: 4px 0; border-bottom: 1px solid #0f172a; }
+    #events .ts { color: #64748b; }
+    .ws-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+    .ws-connected { background: #4ade80; }
+    .ws-disconnected { background: #f87171; }
+  </style>
+</head>
+<body>
+  <h1>Livewire 58K — Command Center</h1>
+  <p class="subtitle">Supervisor Dashboard</p>
+
+  <div class="status-bar">
+    <div class="status-item">
+      <div class="label">Bridge</div>
+      <div class="value" id="bridge-status">—</div>
+    </div>
+    <div class="status-item">
+      <div class="label">Active Sessions</div>
+      <div class="value" id="session-count">—</div>
+    </div>
+    <div class="status-item">
+      <div class="label">WebSocket</div>
+      <div class="value" id="ws-status"><span class="ws-dot ws-disconnected"></span>disconnected</div>
+    </div>
+    <div class="status-item">
+      <div class="label">Uptime</div>
+      <div class="value" id="uptime">—</div>
+    </div>
+  </div>
+
+  <h2 style="font-size: 1rem; margin-bottom: 8px;">Supervision Sessions</h2>
+  <table id="sessions-table">
+    <thead>
+      <tr><th>Bridge ID</th><th>Supervisor</th><th>Mode</th><th>Started</th></tr>
+    </thead>
+    <tbody id="sessions-body">
+      <tr><td colspan="4" class="empty">No active sessions</td></tr>
+    </tbody>
+  </table>
+
+  <h2 style="font-size: 1rem; margin-top: 24px; margin-bottom: 8px;">Event Log</h2>
+  <div id="events"><div class="empty">Waiting for events…</div></div>
+
+  <script>
+    const $ = (s) => document.querySelector(s);
+
+    // Health polling
+    // Base path — works both at root (dev) and behind /cmd/ (nginx)
+    const BASE = document.baseURI.replace(/\/$/, '');
+
+    async function pollHealth() {
+      try {
+        const r = await fetch(BASE + '/health');
+        const d = await r.json();
+        const el = $('#bridge-status');
+        el.textContent = d.bridge ? 'Connected' : 'Disconnected';
+        el.className = 'value ' + (d.bridge ? 'ok' : 'error');
+        $('#uptime').textContent = formatUptime(d.uptime);
+      } catch {
+        $('#bridge-status').textContent = 'Error';
+        $('#bridge-status').className = 'value error';
+      }
+    }
+
+    // Sessions polling
+    async function pollSessions() {
+      try {
+        const r = await fetch(BASE + '/api/supervision/sessions');
+        const d = await r.json();
+        const sessions = d.sessions || [];
+        $('#session-count').textContent = sessions.length;
+        const body = $('#sessions-body');
+        if (!sessions.length) {
+          body.innerHTML = '<tr><td colspan="4" class="empty">No active sessions</td></tr>';
+          return;
+        }
+        body.innerHTML = sessions.map(s => `
+          <tr>
+            <td>${esc(s.bridgeId)}</td>
+            <td>${esc(s.supervisorExtension)}</td>
+            <td><span class="badge badge-${s.mode}">${s.mode}</span></td>
+            <td>${new Date(s.startedAt).toLocaleTimeString()}</td>
+          </tr>
+        `).join('');
+      } catch {}
+    }
+
+    // WebSocket
+    function connectWs() {
+      const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+      // Behind nginx: /cmd-ws proxies WS to port 3050. Direct: same host.
+      const wsPath = location.pathname.startsWith('/cmd') ? '/cmd-ws' : '';
+      const ws = new WebSocket(`${proto}://${location.host}${wsPath}`);
+      ws.onopen = () => {
+        $('#ws-status').innerHTML = '<span class="ws-dot ws-connected"></span>connected';
+      };
+      ws.onclose = () => {
+        $('#ws-status').innerHTML = '<span class="ws-dot ws-disconnected"></span>disconnected';
+        setTimeout(connectWs, 3000);
+      };
+      ws.onmessage = (e) => {
+        const data = JSON.parse(e.data);
+        addEvent(data);
+        pollSessions();
+      };
+    }
+
+    function addEvent(data) {
+      const el = $('#events');
+      if (el.querySelector('.empty')) el.innerHTML = '';
+      const div = document.createElement('div');
+      div.className = 'event';
+      const ts = new Date(data.timestamp).toLocaleTimeString();
+      div.innerHTML = `<span class="ts">${ts}</span> <strong>${esc(data.event)}</strong> ${esc(JSON.stringify(data))}`;
+      el.prepend(div);
+      while (el.children.length > 100) el.lastChild.remove();
+    }
+
+    function formatUptime(s) {
+      const h = Math.floor(s / 3600);
+      const m = Math.floor((s % 3600) / 60);
+      return h > 0 ? `${h}h ${m}m` : `${m}m`;
+    }
+
+    function esc(s) {
+      const d = document.createElement('div');
+      d.textContent = String(s);
+      return d.innerHTML;
+    }
+
+    pollHealth();
+    pollSessions();
+    connectWs();
+    setInterval(pollHealth, 10000);
+    setInterval(pollSessions, 5000);
+  </script>
+</body>
+</html>
