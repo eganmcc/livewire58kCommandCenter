@@ -9,40 +9,85 @@
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; padding: 24px; }
     h1 { font-size: 1.5rem; margin-bottom: 8px; }
     .subtitle { color: #94a3b8; margin-bottom: 24px; font-size: 0.875rem; }
-    .status-bar { display: flex; gap: 16px; margin-bottom: 24px; }
-    .status-item { background: #1e293b; border-radius: 8px; padding: 16px 20px; flex: 1; }
+
+    /* Status bar */
+    .status-bar { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+    .status-item { background: #1e293b; border-radius: 8px; padding: 16px 20px; flex: 1; min-width: 140px; }
     .status-item .label { color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
     .status-item .value { font-size: 1.25rem; font-weight: 600; margin-top: 4px; }
-    .ok { color: #4ade80; }
-    .degraded { color: #fbbf24; }
-    .error { color: #f87171; }
-    #sessions-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-    #sessions-table th, #sessions-table td { text-align: left; padding: 10px 14px; border-bottom: 1px solid #1e293b; }
-    #sessions-table th { color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .ok { color: #4ade80; } .degraded { color: #fbbf24; } .error { color: #f87171; }
+
+    /* Supervisor config */
+    .sup-config { background: #1e293b; border-radius: 8px; padding: 16px 20px; margin-bottom: 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .sup-config label { color: #94a3b8; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .sup-config input { background: #0f172a; border: 1px solid #334155; color: #e2e8f0; padding: 8px 12px; border-radius: 6px; font-size: 0.9rem; width: 160px; }
+    .sup-config input:focus { outline: none; border-color: #3b82f6; }
+    .sup-config .hint { color: #64748b; font-size: 0.75rem; }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid #1e293b; }
+    th { color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; background: #1e293b; position: sticky; top: 0; }
+    .empty { color: #475569; text-align: center; padding: 40px; }
+
+    /* Badges */
     .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
     .badge-monitor { background: #164e63; color: #67e8f9; }
     .badge-whisper { background: #3b0764; color: #d8b4fe; }
     .badge-barge { background: #7c2d12; color: #fdba74; }
-    .empty { color: #475569; text-align: center; padding: 40px; }
-    #events { margin-top: 24px; background: #1e293b; border-radius: 8px; padding: 16px; max-height: 300px; overflow-y: auto; font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 0.8rem; }
+    .badge-up { background: #14532d; color: #4ade80; }
+
+    /* Action buttons */
+    .btn { padding: 5px 12px; border: none; border-radius: 4px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+    .btn:hover { opacity: 0.85; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-spy { background: #164e63; color: #67e8f9; }
+    .btn-whisper { background: #3b0764; color: #d8b4fe; }
+    .btn-barge { background: #7c2d12; color: #fdba74; }
+    .btn-stop { background: #7f1d1d; color: #fca5a5; }
+    .btn-group { display: flex; gap: 4px; }
+
+    /* Sections */
+    .section { margin-bottom: 24px; }
+    .section-header { font-size: 1rem; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .section-header .count { color: #94a3b8; font-size: 0.8rem; font-weight: normal; }
+    .table-wrap { max-height: 400px; overflow-y: auto; border-radius: 8px; border: 1px solid #1e293b; }
+
+    /* Events */
+    #events { background: #1e293b; border-radius: 8px; padding: 16px; max-height: 200px; overflow-y: auto; font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 0.8rem; }
     #events .event { padding: 4px 0; border-bottom: 1px solid #0f172a; }
     #events .ts { color: #64748b; }
+
     .ws-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
     .ws-connected { background: #4ade80; }
     .ws-disconnected { background: #f87171; }
+
+    /* Toast notifications */
+    .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; border-radius: 8px; font-size: 0.85rem; z-index: 1000; animation: slideIn 0.3s; }
+    .toast-ok { background: #14532d; color: #4ade80; border: 1px solid #166534; }
+    .toast-err { background: #7f1d1d; color: #fca5a5; border: 1px solid #991b1b; }
+    @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    /* Supervised row highlight */
+    .row-supervised { background: #1a2332; }
   </style>
 </head>
 <body>
   <h1>Livewire 58K — Command Center</h1>
-  <p class="subtitle">Supervisor Dashboard</p>
+  <p class="subtitle">Supervisor Dashboard <span style="font-size:0.85em;opacity:0.9;font-weight:600;color:#7dd3fc">v1.0.2</span> — Spy · Whisper · Barge</p>
 
+  <!-- Status Bar -->
   <div class="status-bar">
     <div class="status-item">
       <div class="label">Bridge</div>
       <div class="value" id="bridge-status">—</div>
     </div>
     <div class="status-item">
-      <div class="label">Active Sessions</div>
+      <div class="label">Active Calls</div>
+      <div class="value" id="call-count">—</div>
+    </div>
+    <div class="status-item">
+      <div class="label">Supervising</div>
       <div class="value" id="session-count">—</div>
     </div>
     <div class="status-item">
@@ -55,26 +100,88 @@
     </div>
   </div>
 
-  <h2 style="font-size: 1rem; margin-bottom: 8px;">Supervision Sessions</h2>
-  <table id="sessions-table">
-    <thead>
-      <tr><th>Bridge ID</th><th>Supervisor</th><th>Mode</th><th>Started</th></tr>
-    </thead>
-    <tbody id="sessions-body">
-      <tr><td colspan="4" class="empty">No active sessions</td></tr>
-    </tbody>
-  </table>
+  <!-- Supervisor Extension -->
+  <div class="sup-config">
+    <div>
+      <label for="sup-ext">Your Extension</label>
+      <div style="margin-top:4px"><input type="text" id="sup-ext" placeholder="e.g. 9001" /></div>
+    </div>
+    <div class="hint">Enter your supervisor SIP extension before starting supervision</div>
+  </div>
 
-  <h2 style="font-size: 1rem; margin-top: 24px; margin-bottom: 8px;">Event Log</h2>
-  <div id="events"><div class="empty">Waiting for events…</div></div>
+  <!-- Active Calls -->
+  <div class="section">
+    <div class="section-header">
+      <span>Active Calls <span class="count" id="calls-label"></span></span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Caller</th>
+            <th>Agent</th>
+            <th>Customer #</th>
+            <th>Duration</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="calls-body">
+          <tr><td colspan="6" class="empty">Loading calls…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Active Supervision Sessions -->
+  <div class="section">
+    <div class="section-header">
+      <span>Active Supervision <span class="count" id="sup-label"></span></span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Caller → Agent</th>
+            <th>Supervisor</th>
+            <th>Mode</th>
+            <th>Started</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="sessions-body">
+          <tr><td colspan="5" class="empty">No active supervision</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Event Log -->
+  <div class="section">
+    <div class="section-header"><span>Event Log</span></div>
+    <div id="events"><div class="empty">Waiting for events…</div></div>
+  </div>
 
   <script>
     const $ = (s) => document.querySelector(s);
-
-    // Health polling
-    // Base path — works both at root (dev) and behind /cmd/ (nginx)
     const BASE = document.baseURI.replace(/\/$/, '');
 
+    let activeCalls = [];
+    let activeSessions = [];
+    let supervisedBridges = new Set();
+
+    // ── Supervisor Extension (persisted in localStorage) ──
+    const supInput = $('#sup-ext');
+    supInput.value = localStorage.getItem('supExt') || '';
+    supInput.addEventListener('input', () => localStorage.setItem('supExt', supInput.value.trim()));
+
+    function getSupExt() {
+      const ext = supInput.value.trim();
+      if (!ext) { toast('Enter your supervisor extension first', true); supInput.focus(); return null; }
+      return ext;
+    }
+
+    // ── Health polling ──
     async function pollHealth() {
       try {
         const r = await fetch(BASE + '/health');
@@ -89,33 +196,161 @@
       }
     }
 
-    // Sessions polling
+    // ── Active Calls polling ──
+    async function pollCalls() {
+      try {
+        const r = await fetch(BASE + '/api/supervision/calls');
+        const d = await r.json();
+        activeCalls = d.calls || [];
+        $('#call-count').textContent = activeCalls.length;
+        $('#calls-label').textContent = activeCalls.length ? `(${activeCalls.length})` : '';
+        renderCalls();
+      } catch (e) {
+        console.error('pollCalls', e);
+      }
+    }
+
+    function renderCalls() {
+      const body = $('#calls-body');
+      if (!activeCalls.length) {
+        body.innerHTML = '<tr><td colspan="6" class="empty">No active calls</td></tr>';
+        return;
+      }
+      body.innerHTML = activeCalls.map(c => {
+        const session = activeSessions.find(s => s.bridgeId === c.bridgeId) || null;
+        const callerNum = c.caller ? c.caller.number : '?';
+        const agentNum = c.agent ? c.agent.number : '?';
+        const isSup = Boolean(session);
+        const duration = timeSince(c.startedAt);
+        const statusBadges = [`<span class="badge badge-up">Live</span>`];
+
+        if (session) {
+          statusBadges.push(`<span class="badge badge-${session.mode}">${session.mode}</span>`);
+        }
+
+        const actions = session
+          ? `<div class="btn-group">
+              <button class="btn btn-spy" disabled title="Stop supervision first">Spy</button>
+              <button class="btn btn-whisper" disabled title="Stop supervision first">Whisper</button>
+              <button class="btn btn-barge" disabled title="Stop supervision first">Barge</button>
+              <button class="btn btn-stop" onclick="stopSup('${esc(c.bridgeId)}')">Stop</button>
+            </div>`
+          : `<div class="btn-group">
+              <button class="btn btn-spy" onclick="startSup('${esc(c.bridgeId)}','monitor')">Spy</button>
+              <button class="btn btn-whisper" onclick="startSup('${esc(c.bridgeId)}','whisper')">Whisper</button>
+              <button class="btn btn-barge" onclick="startSup('${esc(c.bridgeId)}','barge')">Barge</button>
+            </div>`;
+
+        return `
+          <tr class="${isSup ? 'row-supervised' : ''}">
+            <td>${esc(callerNum)}</td>
+            <td>${esc(agentNum)}</td>
+            <td>${c.custNo ? esc(c.custNo) : '<span style="color:#475569">—</span>'}</td>
+            <td>${duration}</td>
+            <td>${statusBadges.join(' ')}</td>
+            <td>${actions}</td>
+          </tr>`;
+      }).join('');
+    }
+
+    // ── Supervision Sessions polling ──
     async function pollSessions() {
       try {
         const r = await fetch(BASE + '/api/supervision/sessions');
         const d = await r.json();
-        const sessions = d.sessions || [];
-        $('#session-count').textContent = sessions.length;
-        const body = $('#sessions-body');
-        if (!sessions.length) {
-          body.innerHTML = '<tr><td colspan="4" class="empty">No active sessions</td></tr>';
-          return;
-        }
-        body.innerHTML = sessions.map(s => `
-          <tr>
-            <td>${esc(s.bridgeId)}</td>
-            <td>${esc(s.supervisorExtension)}</td>
-            <td><span class="badge badge-${s.mode}">${s.mode}</span></td>
-            <td>${new Date(s.startedAt).toLocaleTimeString()}</td>
-          </tr>
-        `).join('');
+        activeSessions = d.sessions || [];
+        supervisedBridges = new Set(activeSessions.map(s => s.bridgeId));
+        $('#session-count').textContent = activeSessions.length;
+        $('#sup-label').textContent = activeSessions.length ? `(${activeSessions.length})` : '';
+        renderSessions();
+        renderCalls(); // re-render to update supervised status
       } catch {}
     }
 
-    // WebSocket
+    function renderSessions() {
+      const body = $('#sessions-body');
+      if (!activeSessions.length) {
+        body.innerHTML = '<tr><td colspan="5" class="empty">No active supervision</td></tr>';
+        return;
+      }
+      body.innerHTML = activeSessions.map(s => {
+        // Find matching call for caller/agent info
+        const call = activeCalls.find(c => c.bridgeId === s.bridgeId);
+        const callLabel = call
+          ? `${call.caller?.number || '?'} → ${call.agent?.number || '?'}`
+          : esc(s.bridgeId).substring(0, 12) + '…';
+        return `
+          <tr>
+            <td>${callLabel}</td>
+            <td>${esc(s.supervisorExtension)}</td>
+            <td><span class="badge badge-${s.mode}">${s.mode}</span></td>
+            <td>${new Date(s.startedAt).toLocaleTimeString()}</td>
+            <td>
+              <div class="btn-group">
+                <button class="btn btn-spy" disabled title="Stop supervision first">Spy</button>
+                <button class="btn btn-whisper" disabled title="Stop supervision first">Whisper</button>
+                <button class="btn btn-barge" disabled title="Stop supervision first">Barge</button>
+                <button class="btn btn-stop" onclick="stopSup('${esc(s.bridgeId)}')">Stop</button>
+              </div>
+            </td>
+          </tr>`;
+      }).join('');
+    }
+
+    // ── API Actions ──
+    async function startSup(bridgeId, mode) {
+      const ext = getSupExt();
+      if (!ext) return;
+      try {
+        const r = await fetch(BASE + '/api/supervision/start', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bridgeId, supervisorExtension: ext, mode }),
+        });
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error);
+        toast(`Supervision started: ${mode}`);
+        pollSessions();
+      } catch (e) {
+        toast(e.message, true);
+      }
+    }
+
+    async function changeMode(bridgeId, mode) {
+      try {
+        const r = await fetch(BASE + '/api/supervision/mode', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bridgeId, mode }),
+        });
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error);
+        toast(`Mode changed to ${mode}`);
+        pollSessions();
+      } catch (e) {
+        toast(e.message, true);
+      }
+    }
+
+    async function stopSup(bridgeId) {
+      try {
+        const r = await fetch(BASE + '/api/supervision/stop', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bridgeId }),
+        });
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error);
+        toast('Supervision stopped');
+        pollSessions();
+      } catch (e) {
+        toast(e.message, true);
+      }
+    }
+
+    // ── WebSocket ──
     function connectWs() {
       const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-      // Behind nginx: /cmd-ws proxies WS to port 3050. Direct: same host.
       const wsPath = location.pathname.startsWith('/cmd') ? '/cmd-ws' : '';
       const ws = new WebSocket(`${proto}://${location.host}${wsPath}`);
       ws.onopen = () => {
@@ -132,6 +367,7 @@
       };
     }
 
+    // ── Helpers ──
     function addEvent(data) {
       const el = $('#events');
       if (el.querySelector('.empty')) el.innerHTML = '';
@@ -149,16 +385,35 @@
       return h > 0 ? `${h}h ${m}m` : `${m}m`;
     }
 
+    function timeSince(iso) {
+      const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+      if (diff < 0) return '0s';
+      const m = Math.floor(diff / 60);
+      const s = diff % 60;
+      return m > 0 ? `${m}m ${s}s` : `${s}s`;
+    }
+
     function esc(s) {
       const d = document.createElement('div');
       d.textContent = String(s);
       return d.innerHTML;
     }
 
+    function toast(msg, isErr) {
+      const el = document.createElement('div');
+      el.className = 'toast ' + (isErr ? 'toast-err' : 'toast-ok');
+      el.textContent = msg;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 4000);
+    }
+
+    // ── Init ──
     pollHealth();
+    pollCalls();
     pollSessions();
     connectWs();
     setInterval(pollHealth, 10000);
+    setInterval(pollCalls, 5000);
     setInterval(pollSessions, 5000);
   </script>
 </body>

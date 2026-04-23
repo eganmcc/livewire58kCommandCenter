@@ -1,6 +1,6 @@
 {
   "name": "livewire58k-command-center",
-  "version": "2.0.0",
+  "version": "1.0.2",
   "description": "Supervisor Command Center — delegates to ARI Bridge for call supervision (listen/whisper/barge)",
   "main": "src/index.js",
   "scripts": {
